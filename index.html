@@ -1,40 +1,45 @@
 
-<script>
-  Pi.init({ version: "2.0", sandbox: true });
-
-  async function login() {
-    try {
-      const auth = await Pi.authenticate(['username', 'payments']);
-      document.getElementById("status").innerText = "Logged in as: " + auth.user.username;
-    } catch (error) {
-      document.getElementById("status").innerText = "Login failed: " + error;
+function pay() {
+  const paymentData = {
+    amount: 0.01,
+    memo: "Test payment for Video City",
+    metadata: {
+      type: "tip"
     }
-  }
+  };
 
-  function pay() {
-    const paymentData = {
-      amount: 0.01,
-      memo: "Test payment for Video City",
-      metadata: { type: "tip" }
-    };
+  Pi.createPayment(paymentData, {
 
-    Pi.createPayment(paymentData, {
-      onReadyForServerApproval: function(paymentId) {
-        document.getElementById("status").innerText = "Payment approved. ID: " + paymentId;
-        Pi.approvePayment(paymentId); // this opens wallet
-      },
-      onReadyForServerCompletion: function(paymentId, txid) {
-        document.getElementById("status").innerText = "Payment completed! Tx: " + txid;
-        Pi.completePayment(paymentId, txid); // this finishes it
-      },
-      onCancel: function(paymentId) {
-        document.getElementById("status").innerText = "Payment cancelled";
-      },
-      onError: function(error) {
-        document.getElementById("status").innerText = "Error: " + error;
-      }
-    });
-  }
-</script>
-</body>
-</html>
+    onReadyForServerApproval: function(paymentId) {
+      document.getElementById("status").innerText =
+        "Payment is ready for approval: " + paymentId;
+
+      // IMPORTANT:
+      // Send paymentId to your backend here.
+      console.log("Payment ID:", paymentId);
+    },
+
+    onReadyForServerCompletion: function(paymentId, txid) {
+      document.getElementById("status").innerText =
+        "Payment ready for completion. Transaction: " + txid;
+
+      // IMPORTANT:
+      // Send paymentId and txid to your backend here.
+      console.log("Payment ID:", paymentId);
+      console.log("Transaction ID:", txid);
+    },
+
+    onCancel: function(paymentId) {
+      document.getElementById("status").innerText =
+        "Payment cancelled.";
+      console.log("Cancelled payment:", paymentId);
+    },
+
+    onError: function(error, payment) {
+      console.error("Pi payment error:", error, payment);
+
+      document.getElementById("status").innerText =
+        "Payment error: " + (error?.message || error);
+    }
+  });
+}
