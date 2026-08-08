@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video City</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <style>
+    body { font-family: Arial; background: #f0f0f0; margin: 0; }
+    .header { background: #6a0dad; color: white; padding: 15px; text-align: center; }
+    .video-card { background: white; margin: 15px; border-radius: 10px; padding: 10px; }
+    .video-card video { width: 100%; border-radius: 8px; }
+    .tip-btn { background: #6a0dad; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Video City 🎥</h1>
+    <p id="status">Not logged in</p>
+    <button onclick="login()" style="background:white;color:#6a0dad;border:none;padding:8px 15px;border-radius:5px;">Login with Pi</button>
+  </div>
+
+  <div id="feed">
+    <!-- Sample Video 1 -->
+    <div class="video-card">
+      <h3>Creator: @testuser</h3>
+      <video controls src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+      <p>Sample dance video</p>
+      <button class="tip-btn" onclick="tip('testuser', 0.1)">Tip 0.1 Pi 💜</button>
+    </div>
+  </div>
+
+<script>
+Pi.init({ version: "2.0", sandbox: true });
+
+async function login() {
+  try {
+    const auth = await Pi.authenticate(['username', 'payments']);
+    document.getElementById("status").innerText = "Logged in as: " + auth.user.username;
+  } catch (err) {
+    document.getElementById("status").innerText = "Login failed: " + err;
+  }
+}
+
+function tip(creator, amount) {
+  // This sends user to Video City Pay
+  const url = `https://sandbox.minepi.com/aq?creator=${creator}&amount=${amount}`;
+  window.location.href = url;
+}
+</script>
+</body>
+</html>
