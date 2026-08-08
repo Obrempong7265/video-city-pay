@@ -40,23 +40,24 @@
       memo: "Test payment for Video City",
       metadata: { type: "tip" }
     };
-    
     Pi.createPayment(paymentData, {
-      onReadyForServerApproval: function(paymentId) {
-        document.getElementById("status").innerText = "Payment approved. ID: " + paymentId;
-      },
-      onReadyForServerCompletion: function(paymentId, txid) {
-        document.getElementById("status").innerText = "Payment completed! Tx: " + txid;
-      },
-      onCancel: function(paymentId) {
-        document.getElementById("status").innerText = "Payment cancelled";
-      },
-      onError: function(error) {
-        document.getElementById("status").innerText = "Error: " + error;
-      }
-    });
+  onReadyForServerApproval: async function(paymentId) {
+    document.getElementById("status").innerText = "Payment approved. ID: " + paymentId;
+    await Pi.approvePayment(paymentId);  // <-- this makes wallet open
+  },
+  onReadyForServerCompletion: async function(paymentId, txid) {
+    document.getElementById("status").innerText = "Payment completed! Tx: " + txid;
+    await Pi.completePayment(paymentId, txid); // <-- this finishes it
+  },
+  onCancel: function(paymentId) {
+    document.getElementById("status").innerText = "Payment cancelled";
+  },
+  onError: function(error) {
+    document.getElementById("status").innerText = "Error: " + error;
   }
-</script>
-</body>
-</html>
+});
+    
+    
+  
+
 <!-- deployed -->
