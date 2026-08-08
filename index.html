@@ -3,17 +3,59 @@
 <head>
   <title>Video City Pay</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
-    body { font-family: Arial; text-align: center; padding: 50px; background: #6a0dad; color: white; }
+    body { font-family: Arial; text-align: center; padding: 30px; background: #6a0dad; color: white; }
     .card { background: white; color: black; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
     h1 { color: #6a0dad; }
+    button { background: #6a0dad; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; margin: 10px; cursor: pointer; }
+    button:hover { background: #520a99; }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Video City Pay</h1>
-    <p>Welcome to my Pi App!</p>
-    <p>If you see this, it’s working ✅</p>
+    <p>Support creators with Pi 💜</p>
+    
+    <button onclick="login()">Login with Pi</button>
+    <button onclick="pay()">Send 0.01 Pi Test Payment</button>
+    
+    <p id="status">Not logged in</p>
   </div>
+
+<script>
+  Pi.init({ version: "2.0", sandbox: true });
+
+  function login() {
+    Pi.authenticate(['username', 'payments'], function(payment) {}, function(error) {
+      document.getElementById("status").innerText = "Login failed: " + error;
+    }).then(function(auth) {
+      document.getElementById("status").innerText = "Logged in as: " + auth.user.username;
+    });
+  }
+
+  function pay() {
+    const paymentData = {
+      amount: 0.01,
+      memo: "Test payment for Video City",
+      metadata: { type: "tip" }
+    };
+    
+    Pi.createPayment(paymentData, {
+      onReadyForServerApproval: function(paymentId) {
+        document.getElementById("status").innerText = "Payment approved. ID: " + paymentId;
+      },
+      onReadyForServerCompletion: function(paymentId, txid) {
+        document.getElementById("status").innerText = "Payment completed! Tx: " + txid;
+      },
+      onCancel: function(paymentId) {
+        document.getElementById("status").innerText = "Payment cancelled";
+      },
+      onError: function(error) {
+        document.getElementById("status").innerText = "Error: " + error;
+      }
+    });
+  }
+</script>
 </body>
 </html>
